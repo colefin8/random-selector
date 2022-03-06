@@ -1,0 +1,17 @@
+<svg width="240" height="213" viewBox="0 0 240 213" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M240 122.5V127H239.854C236.745 174.891 184.273 213 120 213C55.7266 213 3.25532 174.891 0.145762 127H0V122.5V86H10.1597C28.7673 54.1974 70.9464 32 120 32C169.054 32 211.233 54.1974 229.84 86H240V122.5Z" fill="url(#paint0_linear_20_25)"/>
+<ellipse cx="120" cy="90.5" rx="120" ry="90.5" fill="url(#paint1_radial_20_25)"/>
+<defs>
+<linearGradient id="paint0_linear_20_25" x1="-6.06399e-07" y1="123" x2="240" y2="123" gradientUnits="userSpaceOnUse">
+<stop offset="0.0104167" stop-color="#014D7A"/>
+<stop offset="0.21875" stop-color="#1074AF"/>
+<stop offset="0.510417" stop-color="#4A8EB6"/>
+<stop offset="0.807292" stop-color="#1074AF"/>
+<stop offset="1" stop-color="#003F65"/>
+</linearGradient>
+<radialGradient id="paint1_radial_20_25" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(120 90.5) rotate(90) scale(90.5 120)">
+<stop stop-color="#6CE1F2"/>
+<stop offset="1" stop-color="#07A8D7"/>
+</radialGradient>
+</defs>
+</svg>
