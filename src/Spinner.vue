@@ -1,10 +1,10 @@
 <template>
-    <div style="position: relative; height: 100%;">
+    <div class="wrapper">
         <img class="roulette" src="./assets/roulette_machine.svg"/>
         <div id="text">
             <div v-if="!spinning && !result" class="name" style="display: flex; justify-content: center; align-items: center;"><img src="./assets/awardco-horizontal-black 1.svg"/></div>
             <div v-else :class="[{'spin': spinning}, 'spinner']">
-                <div class="name" v-for="name in shuffledNames" :key="name">{{ name.toUpperCase() }}</div>
+                <div class="name" v-for="(name, index) in shuffledNames" :key="name + index">{{ name.toUpperCase() }}</div>
             </div>
         </div>
         <div id="lights"></div>
@@ -25,13 +25,15 @@ export default {
         return {
             clicked: false,
             spinning: false,
-            result: false
+            result: false,
+            shuffledNames: [...this.names]
         }
     },
     methods: {
         click() {
             this.spinning = false;
             this.clicked = true;
+            this.shuffledNames = this.shuffle(this.names)
             this.spin()
             setTimeout(()=> {
                 this.clicked = false;
@@ -53,21 +55,26 @@ export default {
                 array[randomIndex], array[currentIndex]];
             }
             let multArr = []
-            while(multArr.length < 100){
-                multArr = [...multArr, ...array]
-            }
+            if(array.length < 50 && array.length > 0){
+                while(multArr.length < 100){
+                    multArr = [...multArr, ...array]
+                    console.log(multArr)
+                }
+            } else if (array.length >= 50){
+                multArr = array.slice(0,50)
+            } else multArr = [...array]
             return multArr;
         },
-    },
-    computed: {
-        shuffledNames() {
-            return this.shuffle(this.names)
-        }
     }
 }
 </script>
 
 <style scoped>
+    .wrapper {
+        position: relative;
+        height: 100%;
+        margin-top: calc(50vh - (730.5px / 2))
+    }
     .roulette {
         position: absolute;
         width: 912px;
@@ -76,12 +83,12 @@ export default {
         margin: 0px auto;
     }
     .name {
-       height: 100%;
-       width: 100%;
-       text-align: center;
-       line-height: 117px;
-       font-size: 36px;
-       font-weight: bold;
+        height: 100%;
+        width: 100%;
+        text-align: center;
+        line-height: 117px;
+        font-size: 36px;
+        font-weight: bold;
     }
     .spinner {
         position: absolute;
@@ -102,7 +109,7 @@ export default {
     #button {
         left: 0;
         right: 0;
-        bottom: 10px;
+        top: 655px;
         margin: 0px auto;
         position: absolute;
         height: 98px;
@@ -125,7 +132,7 @@ export default {
         animation: press .5s steps(5) 1;
     }
     .spin {
-        animation: spin 10s ease-in-out;
+        animation: spin 12s ease-in-out;
         animation-fill-mode: forwards;
     }
     @keyframes play {

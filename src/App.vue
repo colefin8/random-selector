@@ -105,7 +105,6 @@ body, html {
   margin: 0;
 }
 .app {
-  padding: 10vh 0;
   height: 100vh;
   width: 100%;
   font-family: Sofia, sans-serif;
