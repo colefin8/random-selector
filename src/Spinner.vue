@@ -58,7 +58,6 @@ export default {
             if(array.length < 50 && array.length > 0){
                 while(multArr.length < 100){
                     multArr = [...multArr, ...array]
-                    console.log(multArr)
                 }
             } else if (array.length >= 50){
                 multArr = array.slice(0,50)

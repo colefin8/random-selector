@@ -71,9 +71,7 @@ export default {
     }
   },
   created() {
-    console.log('created')
     window.addEventListener('keydown', (e => {
-      console.log(e)
       if(e.key === "Escape") {
         this.showSpinner = false;
       }
@@ -119,38 +117,9 @@ body, html {
 }
 
 .file-form {
-  margin: 0px 25vw;
-  padding: 48px;
-  font-size: 36px;
+  margin:  250px 25vw;
+  padding: 100px;
+  font-size: 48px;
   border: 4px dashed #111111;
-}
-
-.button {
-    background-color: #20C4F4;
-    border: 1px solid #20C4F4;
-    box-sizing: border-box;
-    border-radius: 40px;
-    color: #fff;
-    cursor: pointer;
-    display: inline-block;
-    font-family: 'Sofia', arial, sans-serif;
-    font-size: 12px;
-    font-weight: bold;
-    height: 40px;
-    line-height: 37px;
-    padding: 0 20px;
-    text-decoration: none;
-}
-.modal {
-  display: flex;
-  justify-content:center;
-  align-items: center;
-  height: 50vh;
-  width: 50vw;
-  background: #F3F4F6;
-  position: fixed;
-  left: 25vw;
-  top: 25vh;
-  border-radius: 12px;
 }
 </style>
