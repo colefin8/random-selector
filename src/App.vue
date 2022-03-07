@@ -7,15 +7,11 @@
         </div>
     </div>
     <spinner :names="nameArray" v-else></spinner>
-    <!-- <div v-for="(e, i) in nameArray" :key='i'>
-      {{e}}
-    </div> -->
   </div>
 </template>
 
 <script>
 import Spinner from './Spinner.vue'
-
 export default {
   name: 'App',
   components: {Spinner},

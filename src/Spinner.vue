@@ -13,12 +13,15 @@
 </template>
 
 <script>
+import JSConfetti from 'js-confetti'
+
 export default {
     name: 'spinner',
     props: {
         names: {
             type: Array,
             required: true,
+            jsConfetti: null
         }
     },
     data() {
@@ -44,6 +47,11 @@ export default {
                 this.spinning = true;
             }, 500);
             this.result = true;
+            setTimeout(() => {
+                this.jsConfetti.addConfetti({
+                    confettiColors: ['#FA5959', '#20C4F4', '#FDAF08', '#44DDB4']
+                })
+            },12000)
 
         },
         shuffle(array) {
@@ -64,6 +72,9 @@ export default {
             } else multArr = [...array]
             return multArr;
         },
+    },
+    created() {
+        this.jsConfetti = new JSConfetti()
     }
 }
 </script>
