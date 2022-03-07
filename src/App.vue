@@ -6,19 +6,19 @@
           <span class="drop-files">Drop csv here or click to select a file!</span>
         </div>
     </div>
-    <div v-else>
-        Spinner goes here
-    </div>
-    <div v-for="(e, i) in nameArray" :key='i'>
+    <spinner :names="nameArray" v-else></spinner>
+    <!-- <div v-for="(e, i) in nameArray" :key='i'>
       {{e}}
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
+import Spinner from './Spinner.vue'
 
 export default {
   name: 'App',
+  components: {Spinner},
   data(){
     return {
       showUploadModal: false,
@@ -100,40 +100,35 @@ export default {
     src: url('./assets/fonts/sofiapro-light-webfont.woff2') format('woff2'), /* Super Modern Browsers */ url('./assets/fonts/sofiapro-light-webfont.woff') format('woff'); /* Pretty Modern Browsers */
     font-weight: 200;
 }
-
+body, html {
+  padding: 0;
+  margin: 0;
+}
 .app {
+  padding: 10vh 0;
+  height: 100vh;
+  width: 100%;
   font-family: Sofia, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-
-.modal-overlay {
-  position: fixed;
-  left: 0;
-  top:0;
-  width: 100vw;
-  height: 100vh;
-  background-color: #00000060;
-}
-
-.close-button {
-  background-color: none;
-  border: none;
-  cursor: pointer;
+  color: #111827;
+  box-sizing: border-box;
+  background-image: url(./assets/background.svg);
+  background-size: cover;
+  /* background: black; */
 }
 
 .file-form {
+  margin: 0px 25vw;
   padding: 48px;
   font-size: 36px;
   border: 4px dashed #111111;
 }
 
 .button {
-    background-color: #1DC0F0;
-    border: 1px solid #1DC0F0;
+    background-color: #20C4F4;
+    border: 1px solid #20C4F4;
     box-sizing: border-box;
     border-radius: 40px;
     color: #fff;
