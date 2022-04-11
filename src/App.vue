@@ -1,12 +1,18 @@
 <template>
   <div class="app">
     <div v-if="!showSpinner">
-        <input hidden type="file" ref="file" @change="uploadLegacy"/>
-        <div class="file-form" @click='$refs.file.click()' @dragover.prevent @drop.prevent="uploadDrag">
-          <span class="drop-files">Drop csv here or click to select a file!</span>
-        </div>
+      <input hidden type="file" ref="file" @change="uploadLegacy"/>
+      <div class="file-form" @click='$refs.file.click()' @dragover.prevent @drop.prevent="uploadDrag">
+
+        <span class="drop-files">Drop csv here or click to select a file!</span>
+      </div>
+      <label for="delete" style="font-size: 24px;">Remove Winner after spinning?</label>
+      <input name="delete" type="checkbox" style="width: 25px; height: 25px;" v-model="deleteWinner"/>
     </div>
-    <spinner :names="nameArray" v-else></spinner>
+    <div v-else>
+      <div class="back-arrow" role="button" @click="back"></div>
+      <spinner :names="nameArray" :delete-winner="deleteWinner"></spinner>
+    </div>
   </div>
 </template>
 
@@ -21,9 +27,14 @@ export default {
       file: null,
       array: [],
       showSpinner: false,
+      deleteWinner: true
     }
   },
   methods: {
+    back() {
+      this.showSpinner = false;
+      this.array = [];
+    },
     upload(file) {
       const reader = new FileReader()
       let text;
@@ -117,5 +128,19 @@ body, html {
   padding: 100px;
   font-size: 48px;
   border: 4px dashed #111111;
+}
+
+.back-arrow {
+  position: fixed; 
+  left: 20px; 
+  top: 20px; 
+  height: 50px;
+  width: 50px;
+}
+
+.back-arrow:hover {
+  background-image: url(./assets/arrow-circle-left.svg);
+  background-size: cover;
+  background-position: center;
 }
 </style>

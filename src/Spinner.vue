@@ -4,7 +4,7 @@
         <div id="text">
             <div v-if="!spinning && !result" class="name" style="display: flex; justify-content: center; align-items: center;"><img src="./assets/awardco-horizontal-black 1.svg"/></div>
             <div v-else :class="[{'spin': spinning}, 'spinner']">
-                <div class="name" v-for="(name, index) in shuffledNames" :key="name + index">{{ name.toUpperCase() }}</div>
+                <div class="name" :class="{ 'name--small': name.length > 17}" v-for="(name, index) in shuffledNames" :key="name + index">{{ name.toUpperCase() }}</div>
             </div>
         </div>
         <div id="lights"></div>
@@ -18,23 +18,29 @@ import JSConfetti from 'js-confetti'
 export default {
     name: 'spinner',
     props: {
+        deleteWinner: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
         names: {
             type: Array,
             required: true,
-            jsConfetti: null
-        }
+        },
     },
     data() {
         return {
             clicked: false,
             spinning: false,
             result: false,
-            shuffledNames: [...this.names]
+            shuffledNames: [...this.names],
+            winner: '',
+            jsConfetti: null
         }
     },
     methods: {
         click() {
-            this.spinning = false;
+            if(this.spinning) return;
             this.clicked = true;
             this.shuffledNames = this.shuffle(this.names)
             this.spin()
@@ -48,9 +54,13 @@ export default {
             }, 500);
             this.result = true;
             setTimeout(() => {
+                this.spinning = false;
                 this.jsConfetti.addConfetti({
                     confettiColors: ['#FA5959', '#20C4F4', '#FDAF08', '#44DDB4']
                 })
+                if(this.deleteWinner === true) {
+                    this.names.splice(this.names.findIndex(e => e === this.winner),1)
+                }
             },12000)
 
         },
@@ -99,10 +109,19 @@ export default {
         line-height: 117px;
         font-size: 36px;
         font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-sizing: border-box;
+    }
+    .name--small {
+        font-size: 28px;
     }
     .spinner {
         position: absolute;
         width: 100%;
+        box-sizing: border-box;
+        padding: 0px 8px;
     }
     #lights {
         left: 0;
