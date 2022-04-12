@@ -35,12 +35,15 @@ export default {
             result: false,
             shuffledNames: [...this.names],
             winner: '',
-            jsConfetti: null
+            jsConfetti: null,
+            finished: true
         }
     },
     methods: {
         click() {
-            if(this.spinning) return;
+            if(!this.finished) return;
+            this.spinning = false;
+            this.finished = false
             this.clicked = true;
             this.shuffledNames = this.shuffle(this.names)
             this.spin()
@@ -54,7 +57,7 @@ export default {
             }, 500);
             this.result = true;
             setTimeout(() => {
-                this.spinning = false;
+                this.finished = true
                 this.jsConfetti.addConfetti({
                     confettiColors: ['#FA5959', '#20C4F4', '#FDAF08', '#44DDB4']
                 })
