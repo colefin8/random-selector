@@ -1,24 +1,3 @@
 # random-selector
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Upload a csv and randomly select a value from the list.  Can have header "Name", two headers "First Name" and "Last Name", or no headers at all.
