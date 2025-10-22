@@ -15,6 +15,14 @@
               >Drop file here or click to select a file!</span
             >
           </div>
+          <div class="csv-format-info">
+            CSV upload should be formatted with one of the following:
+            <ul>
+              <li>one header "Name"</li>
+              <li>two headers "First Name" and "Last Name"</li>
+              <li>no headers at all, just a list of names in one column</li>
+            </ul>
+          </div>
         </div>
 
         <div class="upload-column">
@@ -395,6 +403,12 @@ html {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 500px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .file-form:hover {
@@ -412,6 +426,18 @@ html {
   display: block;
   font-size: 60px;
   margin-bottom: 20px;
+}
+
+.csv-format-info {
+  margin-top: 20px;
+  padding: 15px 20px;
+  background-color: rgba(31, 41, 55, 0.6);
+  border-radius: 8px;
+  font-size: 16px;
+  color: #d1d5db;
+  text-align: left;
+  border: 1px solid rgba(249, 250, 251, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .back-arrow {
@@ -700,6 +726,7 @@ html {
   .file-form {
     padding: 40px 30px;
     font-size: 24px;
+    height: 200px;
   }
 
   .name-input {
