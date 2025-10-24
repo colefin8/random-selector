@@ -15,6 +15,14 @@
               >Drop file here or click to select a file!</span
             >
           </div>
+          <div class="csv-format-info">
+            CSV upload should be formatted with one of the following:
+            <ul>
+              <li>one header "Name"</li>
+              <li>two headers "First Name" and "Last Name"</li>
+              <li>no headers at all, just a list of names in one column</li>
+            </ul>
+          </div>
         </div>
 
         <div class="upload-column">
@@ -336,9 +344,9 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #111827;
+  color: #f9fafb;
   box-sizing: border-box;
-  background-image: url(./assets/background.svg);
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
   background-size: cover;
 
 }
@@ -372,7 +380,7 @@ html {
 
 .upload-column h2 {
   margin-bottom: 20px;
-  color: #111827;
+  color: #f9fafb;
   font-size: 28px;
 }
 
@@ -386,20 +394,26 @@ html {
 .file-form {
   padding: 60px 40px;
   font-size: 32px;
-  border: 4px dashed #111111;
-  background-color: rgba(255, 255, 255, 0.7);
+  border: 4px dashed #f9fafb;
+  background-color: rgba(31, 41, 55, 0.7);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 500px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .file-form:hover {
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  background-color: rgba(31, 41, 55, 0.9);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
   border-color: #FA5959;
 }
 
@@ -414,6 +428,18 @@ html {
   margin-bottom: 20px;
 }
 
+.csv-format-info {
+  margin-top: 20px;
+  padding: 15px 20px;
+  background-color: rgba(31, 41, 55, 0.6);
+  border-radius: 8px;
+  font-size: 16px;
+  color: #d1d5db;
+  text-align: left;
+  border: 1px solid rgba(249, 250, 251, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 .back-arrow {
   position: fixed;
   left: 20px;
@@ -423,18 +449,18 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(31, 41, 55, 0.8);
   border-radius: 50%;
   cursor: pointer;
   z-index: 100;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .back-arrow:hover {
   transform: scale(1.1);
-  background-color: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  background-color: #1f2937;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 
 .back-icon {
@@ -442,21 +468,21 @@ html {
   width: 100%;
   font-size: 28px;
   font-weight: bold;
-  color: #111827;
+  color: #f9fafb;
 }
 
 .participant-counter {
   position: fixed;
   top: 20px;
   right: 20px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(31, 41, 55, 0.9);
   border-radius: 20px;
   padding: 10px 18px;
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: #f9fafb;
   z-index: 100;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
 }
 
@@ -480,17 +506,17 @@ html {
 }
 
 .validation-container {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(31, 41, 55, 0.9);
   border-radius: 16px;
   padding: 40px;
   max-width: 600px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   text-align: left;
 }
 
 .validation-container h2 {
   font-size: 32px;
-  color: #111827;
+  color: #f9fafb;
   margin-top: 0;
   margin-bottom: 10px;
   text-align: center;
@@ -499,7 +525,7 @@ html {
 .file-info {
   text-align: center;
   font-style: italic;
-  color: #6B7280;
+  color: #9CA3AF;
   margin-bottom: 16px;
 }
 
@@ -513,13 +539,13 @@ html {
 }
 
 .removal-dialog {
-  background-color: #EBF5FF;
-  color: #4F46E5;
-  border: 1px solid #DBEAFE;
+  background-color: #1e3a8a;
+  color: #93c5fd;
+  border: 1px solid #3b82f6;
 }
 
 .validation-errors {
-  background-color: #FFF0F0;
+  background-color: #450a0a;
   border-left: 4px solid #FA5959;
   padding: 15px 20px;
   margin-bottom: 24px;
@@ -533,7 +559,7 @@ html {
 }
 
 .error-message {
-  color: #B91C1C;
+  color: #fca5a5;
   margin-bottom: 8px;
 }
 
@@ -568,16 +594,16 @@ html {
 .stat-value {
   font-size: 48px;
   font-weight: bold;
-  color: #4F46E5;
+  color: #60a5fa;
 }
 
 .stat-label {
   font-size: 16px;
-  color: #6B7280;
+  color: #9CA3AF;
 }
 
 .name-sample {
-  background-color: #F9FAFB;
+  background-color: #374151;
   padding: 15px 20px;
   border-radius: 8px;
   margin-bottom: 30px;
@@ -586,7 +612,7 @@ html {
 .name-sample h3 {
   font-size: 18px;
   margin-top: 0;
-  color: #111827;
+  color: #f9fafb;
 }
 
 .name-sample ul {
@@ -602,8 +628,8 @@ html {
   display: block;
   width: 100%;
   padding: 14px 24px;
-  background-color: #4F46E5;
-  color: white;
+  background-color: #60a5fa;
+  color: #1f2937;
   font-size: 18px;
   font-weight: 600;
   border: none;
@@ -613,13 +639,13 @@ html {
 }
 
 .proceed-button:hover {
-  background-color: #4338CA;
+  background-color: #3b82f6;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .proceed-button:disabled {
-  background-color: #9CA3AF;
+  background-color: #4B5563;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -639,33 +665,34 @@ html {
   padding: 20px;
   font-size: 18px;
   font-family: Sofia, sans-serif;
-  border: 4px dashed #111111;
-  background-color: rgba(255, 255, 255, 0.7);
+  border: 4px dashed #f9fafb;
+  background-color: rgba(31, 41, 55, 0.7);
+  color: #f9fafb;
   border-radius: 12px;
   border-style: solid;
   transition: all 0.3s ease;
   resize: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
 }
 
 .name-input:focus {
   outline: none;
-  border-color: #4F46E5;
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border-color: #60a5fa;
+  background-color: rgba(31, 41, 55, 0.9);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
 .name-input:hover {
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  border-color: #4F46E5;
+  background-color: rgba(31, 41, 55, 0.9);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  border-color: #60a5fa;
 }
 
 .submit-names-button {
   padding: 14px 24px;
-  background-color: #4F46E5;
-  color: white;
+  background-color: #60a5fa;
+  color: #1f2937;
   font-size: 18px;
   font-weight: 600;
   border: none;
@@ -675,9 +702,13 @@ html {
 }
 
 .submit-names-button:hover {
-  background-color: #4338CA;
+  background-color: #3b82f6;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.name-input::placeholder {
+  color: #9CA3AF;
 }
 
 @media screen and (max-width: 900px) {
@@ -695,6 +726,7 @@ html {
   .file-form {
     padding: 40px 30px;
     font-size: 24px;
+    height: 200px;
   }
 
   .name-input {

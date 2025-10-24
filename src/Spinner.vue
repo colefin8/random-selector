@@ -8,7 +8,7 @@
           class="name"
           style="display: flex; justify-content: center; align-items: center"
         >
-          <img src="./assets/awardco-horizontal-black 1.svg" />
+          <img src="./assets/awardco-horizontal-black.svg" />
         </div>
         <div v-else :class="['spinner', { spin: spinning }]">
           <div
@@ -234,6 +234,7 @@ export default {
   filter: brightness(1.1);
 }
 #text {
+  color: #111827;
   height: 117px;
   left: 0;
   right: 0;
