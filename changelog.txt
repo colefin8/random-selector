@@ -1,0 +1,42 @@
+What's New in Random Selector - November 2025
+
+VISUAL IMPROVEMENTS
+- Festive confetti animation - Added colorful falling confetti to make the app feel more celebratory and fun!
+- Cleaner, more professional layout - Updated the design with better spacing and a more polished look
+- Better mobile experience - The app now works great on phones and tablets with improved touch-friendly buttons
+
+NEW FEATURE: MULTIPLE ENTRIES PER PERSON
+The biggest update! You can now give some people more chances to win than others.
+
+How it works:
+- Simple method: Type names like "John Doe, 3" to give John 3 entries in the drawing
+- CSV method: Download our new template file that shows you exactly how to format your data
+- Mix and match: You can have some people with 1 entry and others with multiple entries in the same list
+
+Perfect for scenarios like:
+- Sales contests where top performers get extra entries
+- Raffles where people earned different numbers of tickets
+- Any situation where you want weighted random selection
+
+SMARTER WINNER REMOVAL OPTIONS
+We've improved what happens after someone wins:
+
+- Remove one entry (default): If John has 3 entries and wins, he'll still have 2 chances left for future draws
+- Remove all entries (new option): If John wins, all his entries are removed so he can't win again
+- Keep in pool: Winners stay in for every future draw (original behavior)
+
+BETTER PARTICIPANT OVERVIEW
+- Entry count table: See exactly how many entries each person has before you start spinning
+- Clear summary: Know at a glance how your drawing is set up
+- No surprises: Everything is transparent before you begin
+
+QUALITY OF LIFE UPDATES
+- Download CSV template: Get a perfectly formatted example file to make setup easier
+- Better instructions: Clearer examples and help text throughout the app
+- Improved error messages: More helpful guidance if something goes wrong
+- Faster setup: Streamlined process to get your drawing ready quickly
+
+FULLY BACKWARD COMPATIBLE
+Don't worry! All your existing CSV files and workflows will continue to work exactly as before. These new features are completely optional - if you don't use them, the app behaves exactly like it always has.
+
+Ready to try the new features? The multiple entries system is perfect for making your drawings more fair and flexible. Give it a try on your next raffle or team selection!

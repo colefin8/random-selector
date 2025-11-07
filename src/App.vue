@@ -1,9 +1,14 @@
 <template>
   <div class="app">
     <div v-if="currentView === 'upload'" class="upload-box">
+      <div class="confetti-container">
+        <div class="confetti" v-for="n in 30" :key="n" :style="getConfettiStyle(n)"></div>
+      </div>
+      <h1 class="main-title">Awardco Random Selector</h1>
+      <h2> Two Ways to Add Participants:</h2>
       <div class="upload-columns">
         <div class="upload-column">
-          <h2>Upload CSV File</h2>
+          <h3>Upload CSV File</h3>
           <input hidden type="file" ref="file" @change="uploadLegacy" />
           <div
             class="file-form"
@@ -15,41 +20,54 @@
               >Drop file here or click to select a file!</span
             >
           </div>
-          <div class="csv-format-info">
-            CSV upload should be formatted with one of the following:
-            <ul>
-              <li>one header "Name"</li>
-              <li>two headers "First Name" and "Last Name"</li>
-              <li>no headers at all, just a list of names in one column</li>
-            </ul>
+          <div class="csv-download-container">
+            <button class="csv-template-button" @click="downloadTemplate">
+              Download CSV Template
+            </button>
           </div>
         </div>
-
         <div class="upload-column">
-          <h2>Or Paste Names</h2>
+          <h3> Paste Names</h3>
           <div class="name-input-container">
             <textarea
               v-model="nameInput"
               class="name-input"
-              placeholder="Enter names, one per line"
+              placeholder="Enter names, one per line&#10;For multiple entries use: Name, entries&#10;Example:&#10;John Doe, 3&#10;Jane Smith, 1&#10;Bob Wilson"
             ></textarea>
             <button class="submit-names-button" @click="processNameInput">
               Use These Names
             </button>
+            <div class="text-input-info">
+              You can enter just names (one per line) or use "Name, entries" format for multiple entries per person.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="common-options">
-        <label for="delete" style="font-size: 24px"
-          >Remove winner after spinning?</label
-        >
-        <input
-          name="delete"
-          type="checkbox"
-          style="width: 25px; height: 25px"
-          v-model="deleteWinner"
-        />
+        <div class="option-row">
+          <label for="delete" style="font-size: 24px"
+            >Remove winner after spinning?</label
+          >
+          <input
+            name="delete"
+            type="checkbox"
+            style="width: 25px; height: 25px"
+            v-model="deleteWinner"
+          />
+        </div>
+        
+        <div class="option-row">
+          <label for="deleteAll" style="font-size: 24px"
+            >Remove all copies of winner's name? <span class="dependency-note">(requires first option)</span></label
+          >
+          <input
+            name="deleteAll"
+            type="checkbox"
+            style="width: 25px; height: 25px"
+            v-model="deleteAllCopies"
+          />
+        </div>
       </div>
     </div>
 
@@ -59,10 +77,11 @@
       </div>
 
       <div class="validation-container">
-        <h2>Participant Summary</h2>
+        <h3>Participant Summary</h3>
         <div class="file-info">Source: {{ fileName }}</div>
         <div class="winner-removal-info removal-dialog">
-          <span v-if="deleteWinner">Winners will be removed from the participant pool after selection.</span>
+          <span v-if="deleteWinner && deleteAllCopies">Winners will be removed from the participant pool after selection. All copies of the winner's name will be removed.</span>
+          <span v-else-if="deleteWinner">Winners will be removed from the participant pool after selection. Only one copy of the winner's name will be removed.</span>
           <span v-else>Winners will remain in the participant pool after selection.</span>
         </div>
 
@@ -83,12 +102,27 @@
           </div>
         </div>
 
-        <div class="name-sample" v-if="nameArray.length > 0">
-          <h3>Sample Names:</h3>
-          <ul>
-            <li v-for="(name, index) in nameArray.slice(0, 5)" :key="index">{{ name }}</li>
-            <li v-if="nameArray.length > 5">...</li>
-          </ul>
+        <div class="name-table-container" v-if="nameArray.length > 0">
+          <h3>Participant Entry Counts:</h3>
+          <div class="table-wrapper">
+            <table class="name-entry-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Entries</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in nameEntryTable" :key="index">
+                  <td>{{ item.name }}</td>
+                  <td class="entry-count">{{ item.entries }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-if="nameEntryTable.length === 100" class="table-note">
+              Showing first 100 unique names...
+            </div>
+          </div>
         </div>
 
         <button
@@ -110,6 +144,7 @@
         <spinner
           :names="nameArray"
           :delete-winner="deleteWinner"
+          :delete-all-copies="deleteAllCopies"
           @winner-selected="updateRemainingCount"
           ref="spinnerComponent"
         ></spinner>
@@ -130,6 +165,7 @@ export default {
       array: [],
       currentView: 'upload',
       deleteWinner: true,
+      deleteAllCopies: false,
       validationErrors: [],
       fileName: '',
       nameInput: '',
@@ -244,23 +280,83 @@ export default {
       }
 
       try {
-        const names = this.nameInput.split('\n')
-          .map(name => name.trim())
-          .filter(name => name.length > 0);
+        const lines = this.nameInput.split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0);
 
-        if (names.length === 0) {
+        if (lines.length === 0) {
           this.validationErrors.push('No valid names were found');
           this.currentView = 'validation';
           return;
         }
 
-        this.array = [['name'], ...names.map(name => [name])];
+        // Check if any line contains a comma (name, entries format)
+        const hasCommaFormat = lines.some(line => line.includes(','));
+        
+        if (hasCommaFormat) {
+          // Process as "Name, Entries" format
+          const processedData = [['Name', 'Entries']]; // Header row
+          
+          lines.forEach(line => {
+            if (line.includes(',')) {
+              const parts = line.split(',').map(part => part.trim());
+              if (parts.length >= 2) {
+                const name = parts[0];
+                const entries = parts[1];
+                processedData.push([name, entries]);
+              } else {
+                // Single name on a line with comma but no entry count
+                processedData.push([parts[0], '1']);
+              }
+            } else {
+              // Single name without comma
+              processedData.push([line, '1']);
+            }
+          });
+          
+          this.array = processedData;
+        } else {
+          // Legacy format: just names, one per line
+          this.array = [['name'], ...lines.map(name => [name])];
+        }
 
         this.currentView = 'validation';
       } catch (error) {
         this.validationErrors.push(`Error processing names: ${error.message || 'Unknown error'}`);
         this.currentView = 'validation';
       }
+    },
+
+    getConfettiStyle(index) {
+      const colors = ["#FA5959", "#20C4F4", "#FDAF08", "#44DDB4"];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const randomLeft = Math.random() * 100;
+      const randomDelay = Math.random() * 5;
+      const randomDuration = 3 + Math.random() * 4;
+      const randomSize = 8 + Math.random() * 8;
+
+      return {
+        backgroundColor: randomColor,
+        left: randomLeft + '%',
+        animationDelay: randomDelay + 's',
+        animationDuration: randomDuration + 's',
+        width: randomSize + 'px',
+        height: randomSize + 'px'
+      };
+    },
+
+    downloadTemplate() {
+      const csvContent = "Name,Entries\n";
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'name_entry_template.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     },
   },
   computed: {
@@ -273,16 +369,43 @@ export default {
     nameIndex() {
       return this.array[0]?.length === 1 ? 0 : -1;
     },
+    entriesIndex() {
+      return this.array[0]?.findIndex((e) => e?.toLowerCase?.() === "entries");
+    },
+    nameColumnIndex() {
+      return this.array[0]?.findIndex((e) => e?.toLowerCase?.() === "name");
+    },
     nameArray() {
-      if (this.firstNameIndex >= 0 && this.lastNameIndex >= 0) {
+      // New format: Name and Entries columns
+      if (this.nameColumnIndex >= 0 && this.entriesIndex >= 0) {
+        const result = [];
+        this.array.slice(1).forEach((row) => {
+          const name = row[this.nameColumnIndex]?.trim();
+          const entries = parseInt(row[this.entriesIndex]?.trim()) || 1;
+          if (name) {
+            for (let i = 0; i < entries; i++) {
+              result.push(name);
+            }
+          }
+        });
+        return result;
+      }
+      // Legacy format: First Name and Last Name
+      else if (this.firstNameIndex >= 0 && this.lastNameIndex >= 0) {
         return this.array
           .slice(1)
           .map((e) => `${e[this.firstNameIndex]} ${e[this.lastNameIndex]}`)
           .filter(name => name.trim() !== ' ');
       }
+      // Legacy format: Single Name column (header present but no Entries column)
+      else if (this.nameColumnIndex >= 0 && this.entriesIndex < 0) {
+        return this.array.slice(1).map((e) => `${e[this.nameColumnIndex]}`).filter(name => name.trim() !== '');
+      }
+      // Legacy format: Single column without header
       else if (this.nameIndex >= 0) {
         return this.array.slice(1).map((e) => `${e[this.nameIndex]}`).filter(name => name.trim() !== '');
       }
+      // Legacy format: No headers at all
       else {
         const allRows = [...this.array];
 
@@ -300,6 +423,35 @@ export default {
           .filter(name => name !== '');
       }
     },
+    nameEntryTable() {
+      if (this.nameArray.length === 0) return [];
+      
+      // Count occurrences of each name
+      const nameCounts = {};
+      this.nameArray.forEach(name => {
+        nameCounts[name] = (nameCounts[name] || 0) + 1;
+      });
+      
+      // Convert to array of objects and sort by name
+      return Object.entries(nameCounts)
+        .map(([name, count]) => ({ name, entries: count }))
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .slice(0, 100); // Show first 100 unique names
+    },
+  },
+  watch: {
+    deleteAllCopies(newVal) {
+      // Automatically check the first checkbox when the second one is checked
+      if (newVal === true) {
+        this.deleteWinner = true;
+      }
+    },
+    deleteWinner(newVal) {
+      // Automatically uncheck the second checkbox when the first one is unchecked
+      if (newVal === false) {
+        this.deleteAllCopies = false;
+      }
+    }
   },
   created() {
     window.addEventListener("keydown", (e) => {
@@ -337,6 +489,11 @@ html {
   padding: 0;
   margin: 0;
 }
+
+h2 {
+  font-size: 32px;
+}
+
 .app {
   height: 100vh;
   width: 100%;
@@ -352,23 +509,70 @@ html {
 }
 
 .upload-box {
-  height: 100%;
+  height: 100vh;
   width: 100%;
-  gap: 20px;
+  gap: 15px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 15px;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-title {
+  font-size: 36px;
+  font-weight: 600;
+  color: #f9fafb;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.confetti {
+  position: absolute;
+  top: -20px;
+  animation: fall linear infinite;
+  pointer-events: none;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
 }
 
 .upload-columns {
   display: flex;
   width: 100%;
   max-width: 1200px;
-  gap: 40px;
-  margin-bottom: 30px;
+  gap: 30px;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
 }
 
 .upload-column {
@@ -378,7 +582,7 @@ html {
   align-items: center;
 }
 
-.upload-column h2 {
+.upload-column h3 {
   margin-bottom: 20px;
   color: #f9fafb;
   font-size: 28px;
@@ -386,14 +590,35 @@ html {
 
 .common-options {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 15px;
-  margin-top: 20px;
+  gap: 10px;
+  margin-top: 0;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.option-row label {
+  font-size: 20px;
+}
+
+.dependency-note {
+  font-size: 16px;
+  color: #9CA3AF;
+  font-weight: 400;
+  font-style: italic;
 }
 
 .file-form {
-  padding: 60px 40px;
-  font-size: 32px;
+  padding: 40px 30px;
+  font-size: 28px;
   border: 4px dashed #f9fafb;
   background-color: rgba(31, 41, 55, 0.7);
   border-radius: 12px;
@@ -403,12 +628,13 @@ html {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 500px;
-  height: 300px;
+  height: 220px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .file-form:hover {
@@ -428,14 +654,39 @@ html {
   margin-bottom: 20px;
 }
 
-.csv-format-info {
+.csv-download-container {
   margin-top: 20px;
-  padding: 15px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.csv-template-button {
+  padding: 12px 20px;
+  background-color: #60a5fa;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: Sofia, sans-serif;
+}
+
+.csv-template-button:hover {
+  background-color: #3b82f6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.text-input-info {
+  margin-top: 15px;
+  padding: 12px 16px;
   background-color: rgba(31, 41, 55, 0.6);
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 14px;
   color: #d1d5db;
-  text-align: left;
+  text-align: center;
   border: 1px solid rgba(249, 250, 251, 0.2);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -514,7 +765,7 @@ html {
   text-align: left;
 }
 
-.validation-container h2 {
+.validation-container h3 {
   font-size: 32px;
   color: #f9fafb;
   margin-top: 0;
@@ -602,26 +853,72 @@ html {
   color: #9CA3AF;
 }
 
-.name-sample {
+.name-table-container {
   background-color: #374151;
   padding: 15px 20px;
   border-radius: 8px;
   margin-bottom: 30px;
 }
 
-.name-sample h3 {
+.name-table-container h3 {
   font-size: 18px;
   margin-top: 0;
   color: #f9fafb;
+  margin-bottom: 15px;
 }
 
-.name-sample ul {
-  margin: 0;
-  padding-left: 20px;
+.table-wrapper {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 6px;
 }
 
-.name-sample li {
-  margin-bottom: 5px;
+.name-entry-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1f2937;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.name-entry-table th {
+  background-color: #111827;
+  color: #f9fafb;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.name-entry-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #374151;
+  color: #d1d5db;
+  font-size: 14px;
+}
+
+.name-entry-table tbody tr:hover {
+  background-color: #2d3748;
+}
+
+.name-entry-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.entry-count {
+  text-align: center;
+  font-weight: 600;
+  color: #60a5fa !important;
+}
+
+.table-note {
+  text-align: center;
+  font-style: italic;
+  color: #9CA3AF;
+  margin-top: 10px;
+  font-size: 14px;
 }
 
 .proceed-button {
@@ -661,9 +958,9 @@ html {
 
 .name-input {
   width: 100%;
-  height: 300px;
-  padding: 20px;
-  font-size: 18px;
+  height: 220px;
+  padding: 15px;
+  font-size: 16px;
   font-family: Sofia, sans-serif;
   border: 4px dashed #f9fafb;
   background-color: rgba(31, 41, 55, 0.7);
@@ -674,6 +971,7 @@ html {
   resize: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .name-input:focus {
@@ -712,31 +1010,171 @@ html {
 }
 
 @media screen and (max-width: 900px) {
+  .upload-box {
+    padding: 10px;
+    gap: 10px;
+  }
+
   .upload-columns {
     flex-direction: column;
     align-items: center;
+    gap: 15px;
+    flex: 1;
+    justify-content: center;
   }
 
   .upload-column {
     width: 100%;
     max-width: 500px;
-    margin-bottom: 30px;
+    margin-bottom: 0;
   }
 
   .file-form {
-    padding: 40px 30px;
-    font-size: 24px;
-    height: 200px;
+    padding: 25px 20px;
+    font-size: 22px;
+    height: 160px;
   }
 
   .name-input {
-    height: 200px;
+    height: 160px;
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  .main-title {
+    font-size: 26px;
+    margin: 0;
+  }
+
+  .option-row {
+    flex-direction: row;
+    text-align: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .option-row label {
+    font-size: 18px !important;
+  }
+
+  .common-options {
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  .csv-template-button, .submit-names-button {
+    padding: 8px 16px;
+    font-size: 14px;
   }
 }
 
 @media screen and (max-height: 500px) {
   .participant-counter {
     visibility: hidden;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .main-title {
+    font-size: 22px;
+    margin: 0;
+  }
+
+  .upload-box {
+    padding: 8px;
+    gap: 8px;
+    height: 100vh;
+  }
+
+  .file-form {
+    padding: 20px 15px;
+    font-size: 18px;
+    height: 130px;
+  }
+
+  .name-input {
+    height: 130px;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .option-row label {
+    font-size: 16px !important;
+  }
+
+  .dependency-note {
+    font-size: 13px !important;
+  }
+
+  .csv-template-button, .submit-names-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .upload-columns {
+    gap: 10px;
+  }
+
+  .common-options {
+    gap: 6px;
+  }
+}
+
+@media screen and (max-height: 700px) {
+  .upload-box {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .main-title {
+    font-size: 28px;
+    margin: 0;
+  }
+
+  .upload-columns {
+    gap: 12px;
+  }
+
+  .file-form, .name-input {
+    height: 140px;
+  }
+
+  .file-form {
+    padding: 20px;
+    font-size: 24px;
+  }
+
+  .name-input {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .common-options {
+    gap: 6px;
+    margin-top: 0;
+  }
+}
+
+@media screen and (max-height: 600px) {
+  .main-title {
+    font-size: 24px;
+  }
+
+  .file-form, .name-input {
+    height: 120px;
+  }
+
+  .file-form {
+    padding: 15px;
+    font-size: 20px;
+  }
+
+  .option-row label {
+    font-size: 16px !important;
+  }
+
+  .upload-columns {
+    gap: 8px;
   }
 }
 </style>
