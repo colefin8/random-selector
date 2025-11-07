@@ -43,6 +43,11 @@ export default {
       required: false,
       default: true,
     },
+    deleteAllCopies: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     names: {
       type: Array,
       required: true,
@@ -86,9 +91,17 @@ export default {
         });
 
         if (this.deleteWinner === true) {
-          const winnerIndex = this.names.findIndex((e) => e === this.winner);
-          if (winnerIndex !== -1) {
-            this.names.splice(winnerIndex, 1);
+          if (this.deleteAllCopies === true) {
+            for (let i = this.names.length - 1; i >= 0; i--) {
+              if (this.names[i] === this.winner) {
+                this.names.splice(i, 1);
+              }
+            }
+          } else {
+            const winnerIndex = this.names.findIndex((e) => e === this.winner);
+            if (winnerIndex !== -1) {
+              this.names.splice(winnerIndex, 1);
+            }
           }
         }
         this.$emit('winner-selected', this.winner);
