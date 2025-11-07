@@ -170,7 +170,6 @@ export default {
       fileName: '',
       nameInput: '',
       remainingParticipants: 0,
-      confettiStyles: [],
     };
   },
   methods: {
