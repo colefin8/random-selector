@@ -50,22 +50,27 @@
             >Remove winner after spinning?</label
           >
           <input
+            id="delete"
             name="delete"
             type="checkbox"
             style="width: 25px; height: 25px"
             v-model="deleteWinner"
+            aria-describedby="delete-description"
           />
+          <span id="delete-description" class="sr-only">When enabled, the selected winner will be removed from the participant pool after being chosen</span>
         </div>
         
         <div class="option-row">
           <label for="deleteAll" style="font-size: 24px"
-            >Remove all copies of winner's name? <span class="dependency-note">(requires first option)</span></label
+            >Remove all copies of winner's name? <span class="dependency-note" id="deleteAll-description">(requires first option)</span></label
           >
           <input
+            id="deleteAll"
             name="deleteAll"
             type="checkbox"
             style="width: 25px; height: 25px"
             v-model="deleteAllCopies"
+            aria-describedby="deleteAll-description"
           />
         </div>
       </div>
@@ -305,20 +310,39 @@ export default {
                 const name = parts[0];
                 const entriesRaw = parts[1];
                 const entries = parseInt(entriesRaw, 10);
-                if (!isNaN(entries) && entries > 0) {
-                  processedData.push([name, String(entries)]);
+                if (name && name.length > 0) {
+                  if (!isNaN(entries) && entries > 0) {
+                    processedData.push([name, String(entries)]);
+                  } else {
+                    this.validationErrors.push(
+                      `Line ${idx + 1}: Invalid entry count "${entriesRaw}" for "${name}". Must be a positive integer.`
+                    );
+                  }
                 } else {
                   this.validationErrors.push(
-                    `Line ${idx + 1}: Invalid entry count "${entriesRaw}" for "${name}". Must be a positive integer.`
+                    `Line ${idx + 1}: Empty name found. Please provide a valid name.`
                   );
                 }
               } else {
                 // Single name on a line with comma but no entry count
-                processedData.push([parts[0], '1']);
+                const name = parts[0];
+                if (name && name.length > 0) {
+                  processedData.push([name, '1']);
+                } else {
+                  this.validationErrors.push(
+                    `Line ${idx + 1}: Empty name found. Please provide a valid name.`
+                  );
+                }
               }
             } else {
               // Single name without comma
-              processedData.push([line, '1']);
+              if (line && line.length > 0) {
+                processedData.push([line, '1']);
+              } else {
+                this.validationErrors.push(
+                  `Line ${idx + 1}: Empty name found. Please provide a valid name.`
+                );
+              }
             }
           });
           
@@ -627,6 +651,18 @@ h2 {
   color: #9CA3AF;
   font-weight: 400;
   font-style: italic;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .file-form {
