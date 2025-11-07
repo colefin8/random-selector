@@ -2,7 +2,7 @@
   <div class="app">
     <div v-if="currentView === 'upload'" class="upload-box">
       <div class="confetti-container">
-        <div class="confetti" v-for="n in 30" :key="n" :style="getConfettiStyle(n)"></div>
+        <div class="confetti" v-for="(style, index) in confettiStyles" :key="index" :style="style"></div>
       </div>
       <h1 class="main-title">Awardco Random Selector</h1>
       <h2> Two Ways to Add Participants:</h2>
@@ -170,6 +170,7 @@ export default {
       fileName: '',
       nameInput: '',
       remainingParticipants: 0,
+      confettiStyles: [],
     };
   },
   methods: {
@@ -327,24 +328,6 @@ export default {
       }
     },
 
-    getConfettiStyle(index) {
-      const colors = ["#FA5959", "#20C4F4", "#FDAF08", "#44DDB4"];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      const randomLeft = Math.random() * 100;
-      const randomDelay = Math.random() * 5;
-      const randomDuration = 3 + Math.random() * 4;
-      const randomSize = 8 + Math.random() * 8;
-
-      return {
-        backgroundColor: randomColor,
-        left: randomLeft + '%',
-        animationDelay: randomDelay + 's',
-        animationDuration: randomDuration + 's',
-        width: randomSize + 'px',
-        height: randomSize + 'px'
-      };
-    },
-
     downloadTemplate() {
       const csvContent = "Name,Entries\n";
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -360,6 +343,29 @@ export default {
     },
   },
   computed: {
+    confettiStyles() {
+      const styles = [];
+      const colors = ["#FA5959", "#20C4F4", "#FDAF08", "#44DDB4"];
+      
+      for (let i = 0; i < 30; i++) {
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        const randomLeft = Math.random() * 100;
+        const randomDelay = Math.random() * 5;
+        const randomDuration = 3 + Math.random() * 4;
+        const randomSize = 8 + Math.random() * 8;
+
+        styles.push({
+          backgroundColor: randomColor,
+          left: randomLeft + '%',
+          animationDelay: randomDelay + 's',
+          animationDuration: randomDuration + 's',
+          width: randomSize + 'px',
+          height: randomSize + 'px'
+        });
+      }
+      
+      return styles;
+    },
     lastNameIndex() {
       return this.array[0]?.findIndex((e) => e?.toLowerCase?.() === "last name");
     },
