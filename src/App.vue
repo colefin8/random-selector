@@ -298,13 +298,20 @@ export default {
           // Process as "Name, Entries" format
           const processedData = [['Name', 'Entries']]; // Header row
           
-          lines.forEach(line => {
+          lines.forEach((line, idx) => {
             if (line.includes(',')) {
               const parts = line.split(',').map(part => part.trim());
               if (parts.length >= 2) {
                 const name = parts[0];
-                const entries = parts[1];
-                processedData.push([name, entries]);
+                const entriesRaw = parts[1];
+                const entries = parseInt(entriesRaw, 10);
+                if (!isNaN(entries) && entries > 0) {
+                  processedData.push([name, String(entries)]);
+                } else {
+                  this.validationErrors.push(
+                    `Line ${idx + 1}: Invalid entry count "${entriesRaw}" for "${name}". Must be a positive integer.`
+                  );
+                }
               } else {
                 // Single name on a line with comma but no entry count
                 processedData.push([parts[0], '1']);
