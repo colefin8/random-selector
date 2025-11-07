@@ -387,7 +387,7 @@ export default {
         const result = [];
         this.array.slice(1).forEach((row) => {
           const name = row[this.nameColumnIndex]?.trim();
-          const entries = parseInt(row[this.entriesIndex]?.trim()) || 1;
+          const entries = Math.max(1, parseInt(row[this.entriesIndex]?.trim(), 10) || 1);
           if (name) {
             for (let i = 0; i < entries; i++) {
               result.push(name);
