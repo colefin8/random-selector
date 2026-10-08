@@ -133,7 +133,7 @@
         <button
           class="proceed-button"
           @click="startSpinner"
-          :disabled="nameArray.length === 0"
+          :disabled="nameArray.length === 0 || validationErrors.length > 0"
         >
           Start Random Selection
         </button>
@@ -231,13 +231,26 @@ export default {
           }
 
           let arr = text.split("\n");
-          this.array = arr.map((e) => {
-            if (e.length > 0) {
-              return e.trim().split(",");
-            } else return [];
-          });
+          this.array = arr
+            .map((e) => this.parseCsvLine(e.trim()))
+            .filter((row) => row.some((cell) => cell !== ""));
           if (arr.length === 0) {
             this.validationErrors.push('CSV file appears to be empty');
+          }
+
+          if (this.nameColumnIndex >= 0 && this.entriesIndex >= 0) {
+            this.array.slice(1).forEach((row, idx) => {
+              const rowNum = idx + 2;
+              const name = row[this.nameColumnIndex];
+              const entriesRaw = row[this.entriesIndex] ?? "";
+              if (!name) {
+                this.validationErrors.push(`Row ${rowNum}: Empty name found. Please provide a valid name.`);
+              } else if (entriesRaw !== "" && !(/^\d+$/.test(entriesRaw) && parseInt(entriesRaw, 10) > 0)) {
+                this.validationErrors.push(
+                  `Row ${rowNum}: Invalid entry count "${entriesRaw}" for "${name}". Must be a positive integer.`
+                );
+              }
+            });
           }
 
           if (this.nameArray.length === 0) {
@@ -257,6 +270,33 @@ export default {
         }
       };
       reader.readAsText(file);
+    },
+    parseCsvLine(line) {
+      const cells = [];
+      let cell = "";
+      let quoted = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (quoted) {
+          if (ch === '"' && line[i + 1] === '"') {
+            cell += '"';
+            i++;
+          } else if (ch === '"') {
+            quoted = false;
+          } else {
+            cell += ch;
+          }
+        } else if (ch === '"') {
+          quoted = true;
+        } else if (ch === ",") {
+          cells.push(cell.trim());
+          cell = "";
+        } else {
+          cell += ch;
+        }
+      }
+      cells.push(cell.trim());
+      return cells;
     },
     uploadDrag(e) {
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
@@ -415,9 +455,9 @@ export default {
       else if (this.nameColumnIndex >= 0 && this.entriesIndex < 0) {
         return this.array.slice(1).map((e) => `${e[this.nameColumnIndex]}`).filter(name => name.trim() !== '');
       }
-      // Legacy format: Single column without header
+      // Legacy format: Single column without header (every row is a name)
       else if (this.nameIndex >= 0) {
-        return this.array.slice(1).map((e) => `${e[this.nameIndex]}`).filter(name => name.trim() !== '');
+        return this.array.map((e) => `${e[this.nameIndex]}`).filter(name => name.trim() !== '');
       }
       // Legacy format: No headers at all
       else {

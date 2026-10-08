@@ -129,7 +129,6 @@ export default {
       }
       rouletteList.push(winner);
 
-      console.table(rouletteList)
       return rouletteList;
     },
     shuffleArray(array) {
