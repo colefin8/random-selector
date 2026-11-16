@@ -160,6 +160,11 @@
 
 <script>
 import Spinner from "./Spinner.vue";
+
+// Each entry becomes an item in the spinner's list, so an unbounded count
+// (e.g. "Bob,999999999") would freeze the tab.
+const MAX_ENTRIES_PER_NAME = 1000;
+
 export default {
   name: "App",
   components: { Spinner },
@@ -248,6 +253,10 @@ export default {
               } else if (entriesRaw !== "" && !(/^\d+$/.test(entriesRaw) && parseInt(entriesRaw, 10) > 0)) {
                 this.validationErrors.push(
                   `Row ${rowNum}: Invalid entry count "${entriesRaw}" for "${name}". Must be a positive integer.`
+                );
+              } else if (entriesRaw !== "" && parseInt(entriesRaw, 10) > MAX_ENTRIES_PER_NAME) {
+                this.validationErrors.push(
+                  `Row ${rowNum}: Entry count ${entriesRaw} for "${name}" is too high. Maximum is ${MAX_ENTRIES_PER_NAME}.`
                 );
               }
             });
@@ -351,7 +360,12 @@ export default {
                 const entriesRaw = parts[1];
                 const entries = parseInt(entriesRaw, 10);
                 if (name && name.length > 0) {
-                  if (!isNaN(entries) && entries > 0) {
+                  if (!isNaN(entries) && entries > MAX_ENTRIES_PER_NAME) {
+                    this.validationErrors.push(
+                      `Line ${idx + 1}: Entry count ${entries} for "${name}" is too high. Maximum is ${MAX_ENTRIES_PER_NAME}.`
+                    );
+                    processedData.push([name, String(MAX_ENTRIES_PER_NAME)]);
+                  } else if (!isNaN(entries) && entries > 0) {
                     processedData.push([name, String(entries)]);
                   } else {
                     this.validationErrors.push(
@@ -435,7 +449,10 @@ export default {
         const result = [];
         this.array.slice(1).forEach((row) => {
           const name = row[this.nameColumnIndex]?.trim();
-          const entries = Math.max(1, parseInt(row[this.entriesIndex]?.trim(), 10) || 1);
+          const entries = Math.min(
+            MAX_ENTRIES_PER_NAME,
+            Math.max(1, parseInt(row[this.entriesIndex]?.trim(), 10) || 1)
+          );
           if (name) {
             for (let i = 0; i < entries; i++) {
               result.push(name);
